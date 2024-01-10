@@ -48,7 +48,7 @@ const AppLayout = () => {
         <Header style={{ padding: 0, background: '#fff' }}>
           <Space style={{ fontSize: '1.5rem', justifyContent: 'center', display: 'flex' }}>  {title === 'produtos' ? "Marketplace" : 'Dashboard'}</Space>
         </Header>
-        <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', }}>
+        <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', overflowY: 'auto' }}>
           <Outlet />
         </Content>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©{new Date().getFullYear()} Created by Ant UED</Footer>

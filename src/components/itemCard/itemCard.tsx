@@ -20,12 +20,12 @@ export default function ItemCard(props: IProps) {
   }
   return (
     <Card
-      style={{ width: '100%' }}
+      style={{ width: '100%', padding: '0' }}
       cover={
         <img
           alt="picture item"
           src={props.item.picture}
-          height={380}
+          height={250}
           width={'100%'}
         />
       }
