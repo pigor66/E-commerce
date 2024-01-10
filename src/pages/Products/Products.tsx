@@ -23,7 +23,7 @@ function Products() {
         </Space>
       </Col>
       {items.data.map((item: any) => (
-        <Col span={24} md={12} lg={8} xl={8} key={item.id}>
+        <Col span={24} md={12} lg={8} xl={8} key={item.id} style={{ display: 'flex', justifyContent: 'center' }}>
           <ItemCard
             setOpen={setOpen}
             item={item}
