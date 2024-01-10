@@ -1,22 +1,13 @@
-import { Row, Col, Space, Button, Card, notification } from 'antd';
-import { useState } from 'react';
-import ItemModal from '../../components/Modal/ItemModal';
-import items from './../../items/items.json';
-import { EditOutlined } from '@ant-design/icons';
+import { Row, Col, Space, Button, Card, notification, Typography } from 'antd';
+import items from './../../Data/data.json';
 import ItemDetails from '../../components/ItemDetails/ItemDetails';
 import Meta from 'antd/es/card/Meta';
 import { formatPriceBRL } from '../Home/Dashboard';
+import Car from '../../components/Car/car';
+const { Title, Paragraph } = Typography;
 
 function Products() {
-  const [open, setOpen] = useState(false);
   const [api, contextHolder] = notification.useNotification();
-
-  const showModal = () => {
-    setOpen(true);
-  };
-  function handleEditItem() {
-    setOpen(true);
-  }
 
   function openNotification(title: string, description: string, type: 'success' | 'error') {
     api[type]({
@@ -24,43 +15,52 @@ function Products() {
       description: description,
     });
   };
+
+  function addToCar(item: any) {
+    openNotification('Adicionado ao seu carrinho', `O item ${item.name} foi adicionado ao carrinho`, 'success')
+  }
+
   return (
-    <Row gutter={[24, 24]} style={{ width: '100%' }} >
-      {contextHolder}
-      <Col span={24}>
-        <Space>
-          <ItemModal setOpen={setOpen} open={open} />
-          <Button type="primary" onClick={showModal}>
-            Novo item
-          </Button>
-        </Space>
+    <Row gutter={[24, 24]} justify={'center'} style={{ marginTop: '2rem' }}>
+      <Col span={24} lg={23} style={{ display: 'flex', justifyContent: 'center' }}>
+        <Row gutter={[24, 24]} style={{ width: '100%' }}  >
+          {contextHolder}
+          {items.products.map((item: any) => (
+            <Col span={24} md={12} lg={8} key={item.id} style={{ display: 'flex', justifyContent: 'center' }}>
+              <Card
+                cover={
+                  <div style={{ backgroundImage: `url('${item.picture}')`, width: '100%', height: '15rem', backgroundSize: "cover", backgroundPosition: "center" }} >
+                  </div>
+                }
+                actions={
+                  [
+                    <ItemDetails data={item} addToCar={addToCar} openNotification={openNotification} />
+                  ]
+
+                }
+
+              >
+                <Space direction='vertical' style={{ width: '100%' }}>
+                  <Space direction='vertical'>
+                    <Title level={4} style={{ margin: "0" }}>
+                      {item?.name}
+                    </Title>
+                  </Space>
+                  <Button key="buy" onClick={() => {
+                    addToCar(item)
+                  }}>{formatPriceBRL(item.price)}</Button>
+                </Space>
+                <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
+                  {item.description && item.description.length > 100
+                    ? `${item.description.slice(0, 100)}...`
+                    : item.description}
+                </p>
+              </Card>
+            </Col>
+          ))}
+        </Row>
       </Col>
-      {items.data.map((item: any) => (
-        <Col span={24} md={12} lg={6} key={item.id} >
-          <Card
-            style={{ width: '100%', padding: '0' }}
-            cover={
-              <img
-                alt="picture item"
-                src={item.picture}
-                height={230}
-                width={'100%'}
-              />
-            }
-            actions={[
-              <Button key="edit" onClick={() => {
-                openNotification('Adicionado ao seu carrinho', `O item ${item.name} foi adicionado ao carrinho`, 'success')
-              }}> Comprar por: {formatPriceBRL(item.price)}</Button>,
-              <ItemDetails data={item} />,
-            ]}
-          >
-            <Meta
-              title={item?.name}
-              description={formatPriceBRL(item.price)}
-            />
-          </Card>
-        </Col>
-      ))}
+      <Car />
     </Row>
   );
 }

@@ -8,8 +8,8 @@ export const router = createBrowserRouter([
         path: '/',
         element: <AppLayout />,
         children: [
-            { path: '/', element: <Dashboard /> },
-            { path: '/produtos', element: <Products /> },
+            { path: '/admin', element: <Dashboard /> },
+            { path: '/', element: <Products /> },
         ],
     },
 ]);

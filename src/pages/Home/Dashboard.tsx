@@ -1,7 +1,7 @@
 import { Image, Col, List, Row, Space, Typography, Button, Divider, Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import ItemModal from '../../components/Modal/ItemModal';
-import items from './../../items/items.json';
+import items from './../../Data/data.json';
 import VirtualList from 'rc-virtual-list';
 const { Title, Paragraph } = Typography;
 
@@ -22,17 +22,29 @@ export function formatPriceBRL(valor: number) {
 
 function Dashboard() {
   const [open, setOpen] = useState(false);
+  const [openNew, setOpenNew] = useState(false);
   const [editItem, setEditItem] = useState(null); // Adicionei null como valor inicial
 
+  const showModal = () => {
+    setOpenNew(true);
+  };
 
   return (
 
     <Row gutter={[24, 24]}>
 
       <Col span={24}>
+        <Space>
+          <ItemModal setOpen={setOpenNew} open={openNew} />
+          <Button type="primary" onClick={showModal}>
+            Novo item
+          </Button>
+        </Space>
+      </Col>
+      <Col span={24}>
         <List>
           <VirtualList
-            data={items.data}
+            data={items.products}
             height={800}
             itemHeight={47}
             itemKey="email"
@@ -62,9 +74,6 @@ function Dashboard() {
                         </Space>
                       </Space>
                     </Col>
-                    <Col lg={4} xs={24} >
-
-                    </Col>
 
                   </Row>
                 </Card>
@@ -76,7 +85,6 @@ function Dashboard() {
 
       </Col>
       <ItemModal setOpen={setOpen} open={open} editItem={editItem} />
-
     </Row>
 
   );

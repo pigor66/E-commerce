@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Button, Modal } from 'antd';
+import { Modal } from 'antd';
 import ItemForm from '../ItemForm/ItemForm';
 
 interface IProps {
@@ -8,13 +8,10 @@ interface IProps {
   editItem?: any
 }
 const ItemModal: React.FC<IProps> = (props: IProps) => {
-  const [loading, setLoading] = useState(false);
   const modalRef = useRef<any>(null); // Referência para a modal
 
   const handleOk = () => {
-    setLoading(true);
     setTimeout(() => {
-      setLoading(false);
       props.setOpen(false);
     }, 3000);
   };
@@ -28,15 +25,12 @@ const ItemModal: React.FC<IProps> = (props: IProps) => {
 
   return (
     <>
-
       <Modal
         open={props.open}
-        title="Title"
+        title="Cadastrar novo produto"
         onOk={handleOk}
         onCancel={handleCancel}
-        footer={[
-
-        ]}
+        footer={[]}
       >
         <ItemForm editItem={props.editItem} onClose={handleCancel} handleOk={handleOk} />
       </Modal>

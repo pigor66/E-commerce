@@ -4,6 +4,8 @@ import { formatPriceBRL } from '../../pages/Home/Dashboard';
 
 interface IProps {
   data: any;
+  openNotification: (title: string, description: string, type: 'success' | 'error') => void
+  addToCar: (value: any) => void
 }
 const ItemDetails: React.FC<IProps> = (props: IProps) => {
   const [open, setOpen] = useState(false);
@@ -27,9 +29,9 @@ const ItemDetails: React.FC<IProps> = (props: IProps) => {
 
   return (
     <>
-      <Button type='link' onClick={() => setOpen(true)}>
-        Ver produto
-      </Button>
+      <a type='link' onClick={() => setOpen(true)}>
+        Ver detalhes
+      </a>
 
       <Modal
         visible={open}
@@ -46,9 +48,12 @@ const ItemDetails: React.FC<IProps> = (props: IProps) => {
           <Space direction='vertical'>
             <p>{props?.data?.description}</p>
           </Space>
-          <Space direction='vertical'>
-            <Button> Comprar por: {formatPriceBRL(props?.data?.price)}</Button>
-          </Space>
+          <Button type='primary'
+            onClick={() => {
+              props.addToCar(props.data);
+              setOpen(false)
+            }}
+          > Comprar por: {formatPriceBRL(props?.data?.price)}</Button>
         </Card>
       </Modal>
     </>
