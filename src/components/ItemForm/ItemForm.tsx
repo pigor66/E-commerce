@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Col, Form, Input, InputNumber, Row, UploadFile, notification } from 'antd';
 import Upload, { UploadChangeParam } from 'antd/es/upload';
 import TextArea from 'antd/es/input/TextArea';
-
+import data from './../../Data/data.json'
 type FieldType = {
   name: string;
   description?: string;
@@ -17,11 +17,25 @@ interface IProps {
   handleOk: () => void
 }
 
+// Função para formatar valor como moeda brasileira
+const formatCurrency = (value: number | null) => {
+  if (value === null || isNaN(value)) {
+    return '';
+  }
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
+};
+
 export default function ItemForm(props: IProps) {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [price, setPrice] = useState<number>(1); // Inicializado com 1 para evitar problemas de formatação inicial
+  const [price, setPrice] = useState<number | null>(null);
+  const [picture, setPicture] = useState<string>('');
+
+  const [formattedPrice, setFormattedPrice] = useState<string>('');
   const [api, contextHolder] = notification.useNotification();
 
   function openNotification(title: string, description: string, type: 'success' | 'error') {
@@ -37,6 +51,20 @@ export default function ItemForm(props: IProps) {
     if (!src && file.originFileObj) {
       const blob = new Blob([file.originFileObj as Blob]);
       src = URL.createObjectURL(blob);
+      setPicture(src)
+    }
+  };
+
+
+
+  const handleBlur = () => {
+    if (formattedPrice !== '') {
+      const numericValue = parseFloat(formattedPrice.replace(/[^\d.,]/g, '').replace(',', '.'));
+      setPrice(isNaN(numericValue) ? null : numericValue);
+      setFormattedPrice(formatCurrency(numericValue));
+    } else {
+      setPrice(null);
+      setFormattedPrice('');
     }
   };
 
@@ -55,7 +83,7 @@ export default function ItemForm(props: IProps) {
       }
     });
 
-    values.date = new Date().toLocaleDateString()
+
     localStorage.setItem('temporaryImageBlobUrls', JSON.stringify(blobUrls));
     values.picture = blobUrls;
 
@@ -66,16 +94,31 @@ export default function ItemForm(props: IProps) {
       case (!values.name):
         openNotification('Falha ao cadastrar item - Nome', ' Por favor coloque um nome ao item!', 'error');
         break;
-      case (!values.price):
+      case (values.price < 0):
         openNotification('Falha ao cadastrar item - Preço', ' Por favor coloque um valor ao item!', 'error');
         break;
       case (!values.picture.length):
         openNotification('Falha ao cadastrar item - Imagem', ' Por favor coloque uma imagem ao item!', 'error');
         break;
       default:
+
+
+        const newItem = {
+          id: data.products.length > 0 ? data.products[data.products.length - 1].id + 1 : 1, name: name,
+          description: description,
+          price: price !== null ? price : 0, // Defina o valor padrão como desejado
+          date: new Date().toLocaleDateString(),
+          picture: blobUrls,
+        }
+        data.products.push(newItem)
+        console.log(newItem);
+        console.log(values);
+
+
         openNotification(`Item cadastrado com sucesso!`, `${values.name} foi cadastrado!`, 'success');
         break;
     }
+
   };
 
   return (
@@ -99,12 +142,21 @@ export default function ItemForm(props: IProps) {
 
         </Col>
         <Col lg={8}>
-          <Form.Item<FieldType> label="Preço" name="price" >
+          <Form.Item<FieldType> label="Preço" name="price">
+            {/* Input de texto para mostrar e permitir edição do valor formatado como moeda brasileira */}
+            <Input
+              onBlur={handleBlur}
+              value={formattedPrice}
+              onChange={(e) => setFormattedPrice(e.target.value)}
+              style={{ width: '100%' }}
+            />
+
+            {/* InputNumber para manter o valor numérico para processamento adicional, se necessário */}
             <InputNumber
               min={1}
-              style={{ width: '100%' }}
-              formatter={(value) => `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              defaultValue={price}
+              onChange={(value) => setPrice(value as number | null)}
+              value={price}
+              style={{ display: 'none' }}  // Esconde o InputNumber, pois não será exibido na interface
             />
           </Form.Item>
         </Col>

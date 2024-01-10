@@ -34,29 +34,32 @@ const AppLayout = () => {
 
   return (
     <Layout style={{ height: '100vh' }}>
-      <Sider breakpoint="lg" collapsedWidth="0" width={300} >
-        <div className="demo-logo-vertical" />
-        <Space direction='vertical' style={{ padding: '1rem' }}>
-          <div style={{ padding: ' 0 5rem ' }}>
-            <img src={logo} alt="" style={{ width: '100%' }} />
-          </div>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['store']}  >
-            {menuItems.map(item => (
-              <Menu.Item key={item.key} icon={item.icon}>
-                <Link to={item.to}>{item.label}</Link>
-              </Menu.Item>
-            ))}
-          </Menu>
+      <Sider breakpoint="lg" collapsedWidth="0" width={300}>
+        <Space direction='vertical' style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Space direction='vertical' style={{ padding: '1rem' }}>
+            <div style={{ padding: '0 5rem' }}>
+              <img src={logo} alt="" style={{ width: '100%' }} />
+            </div>
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={['store']}>
+              {menuItems.map(item => (
+                <Menu.Item key={item.key} icon={item.icon}>
+                  <Link to={item.to}>{item.label}</Link>
+                </Menu.Item>
+              ))}
+            </Menu>
+          </Space>
+          <Footer style={{ backgroundColor: '#00101e', color: '#fff', textAlign: 'center' }}>
+            ©{new Date().getFullYear()} Created by Higor Ribeiro
+          </Footer>
         </Space>
       </Sider>
-      <Layout style={{ overflowY: 'auto' }}>
-        <Header style={{ padding: 0, background: '#fff' }}>
-          <Space style={{ fontSize: '1.5rem', justifyContent: 'center', display: 'flex' }}>  {title === 'produtos' ? "Marketplace" : 'Dashboard'}</Space>
+      <Layout style={{ backgroundColor: '#f0f1f1' }} >
+        <Header style={{ padding: 0, background: '#fff', }}>
+          <Space style={{ fontSize: '1.5rem', justifyContent: 'center', display: 'flex' }}>  {title === '' ? "Marketplace" : 'Dashboard'}</Space>
         </Header>
         <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', display: 'flex:', justifyContent: 'center', overflowY: 'auto' }}>
           <Outlet />
         </Content>
-        <Footer style={{ textAlign: 'center' }}> ©{new Date().getFullYear()} Created by Higor Ribeiro</Footer>
       </Layout>
     </Layout>
   );

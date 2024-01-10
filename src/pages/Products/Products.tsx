@@ -28,6 +28,8 @@ function Products() {
           {items.products.map((item: any) => (
             <Col span={24} md={12} lg={8} key={item.id} style={{ display: 'flex', justifyContent: 'center' }}>
               <Card
+                style={{ width: '100%' }}
+                hoverable
                 cover={
                   <div style={{ backgroundImage: `url('${item.picture}')`, width: '100%', height: '15rem', backgroundSize: "cover", backgroundPosition: "center" }} >
                   </div>
@@ -36,9 +38,7 @@ function Products() {
                   [
                     <ItemDetails data={item} addToCar={addToCar} openNotification={openNotification} />
                   ]
-
                 }
-
               >
                 <Space direction='vertical' style={{ width: '100%' }}>
                   <Space direction='vertical'>
