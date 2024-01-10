@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Form, Input, InputNumber, UploadFile, UploadProps, notification } from 'antd';
+import { Button, Form, Input, InputNumber, UploadFile } from 'antd';
 import Upload, { RcFile, UploadChangeParam } from 'antd/es/upload';
 import TextArea from 'antd/es/input/TextArea';
+import NotificationComponent from '../Notification/notification';
 
 type FieldType = {
   name: string;
@@ -16,19 +17,14 @@ interface IProps {
   handleOk: () => void
 }
 
+
 export default function ItemForm(props: IProps) {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [name, setName] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [price, setPrice] = useState<number | string>(1); // Inicializado com 1 para evitar problemas de formatação inicial
-  const [api, contextHolder] = notification.useNotification();
 
-  function openNotification(title: string, description: string, type: 'success' | 'error') {
-    api[type]({
-      message: title,
-      description: description,
-    });
-  };
+
 
   const onPreview = async (file: UploadFile) => {
     let src = file.url as string;
@@ -64,16 +60,16 @@ export default function ItemForm(props: IProps) {
     // Lógica de validação
     switch (true) {
       case (!values.name):
-        openNotification('Falha ao cadastrar item - Nome', ' Por favor coloque um nome ao item!', 'error');
+        NotificationComponent('Falha ao cadastrar item - Nome', ' Por favor coloque um nome ao item!', 'error');
         break;
       case (!values.price):
-        openNotification('Falha ao cadastrar item - Preço', ' Por favor coloque um valor ao item!', 'error');
+        NotificationComponent('Falha ao cadastrar item - Preço', ' Por favor coloque um valor ao item!', 'error');
         break;
       case (!values.picture.length):
-        openNotification('Falha ao cadastrar item - Imagem', ' Por favor coloque uma imagem ao item!', 'error');
+        NotificationComponent('Falha ao cadastrar item - Imagem', ' Por favor coloque uma imagem ao item!', 'error');
         break;
       default:
-        openNotification(`Item cadastrado com sucesso!`, `${values.name} foi cadastrado!`, 'success');
+        NotificationComponent(`Item cadastrado com sucesso!`, `${values.name} foi cadastrado!`, 'success');
         break;
     }
   };
@@ -93,7 +89,6 @@ export default function ItemForm(props: IProps) {
       }}
       autoComplete="off"
     >
-      {contextHolder}
       <Form.Item<FieldType> label="Nome do item" name="name">
         <Input value={name} onChange={(e) => setName(e.target.value)} />
       </Form.Item>

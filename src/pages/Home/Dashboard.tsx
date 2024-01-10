@@ -1,29 +1,28 @@
 import { Image, Col, List, Row, Space, Typography, Button, Divider, Card } from 'antd';
 import React, { useEffect, useState } from 'react';
 import ItemModal from '../../components/Modal/ItemModal';
-import ItemCard from '../../components/itemCard/itemCard';
 import items from './../../items/items.json';
 import VirtualList from 'rc-virtual-list';
 const { Title, Paragraph } = Typography;
 
+export function formatPriceBRL(valor: number) {
+  // Verifica se o valor é um número
+  if (isNaN(valor)) {
+    return 'Valor inválido';
+  }
+
+  // Formata o valor como moeda
+  const valorFormatado = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(valor);
+
+  return valorFormatado;
+}
 
 function Dashboard() {
   const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState(null); // Adicionei null como valor inicial
-  function formatarValorEmDinheiro(valor: number) {
-    // Verifica se o valor é um número
-    if (isNaN(valor)) {
-      return 'Valor inválido';
-    }
-
-    // Formata o valor como moeda
-    const valorFormatado = new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(valor);
-
-    return valorFormatado;
-  }
 
 
   return (
@@ -52,7 +51,7 @@ function Dashboard() {
                           {item.name}
                         </Title>
                         <Title level={5} style={{ margin: 0 }}>
-                          Valor: {formatarValorEmDinheiro(item.price)}
+                          Valor: {formatPriceBRL(item.price)}
                         </Title>
                         <Paragraph style={{ margin: 0, maxWidth: '80rem' }}>
                           {item.description}

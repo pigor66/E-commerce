@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Modal, Space, Image } from 'antd';
-import ItemForm from '../ItemForm/ItemForm';
-import { EditOutlined } from '@ant-design/icons';
-import Meta from 'antd/es/card/Meta';
+import { formatPriceBRL } from '../../pages/Home/Dashboard';
 
 interface IProps {
-  data: any
+  data: any;
 }
 const ItemDetails: React.FC<IProps> = (props: IProps) => {
   const [open, setOpen] = useState(false);
-
   const [loading, setLoading] = useState(false);
+
   const handleOk = () => {
     setLoading(true);
     setTimeout(() => {
@@ -23,33 +21,33 @@ const ItemDetails: React.FC<IProps> = (props: IProps) => {
     setOpen(false);
   };
 
+  useEffect(() => {
+    console.log(props.data);
+  }, [open]);
+
   return (
     <>
       <Button type='link' onClick={() => setOpen(true)}>
         Ver produto
       </Button>
+
       <Modal
-        open={open}
-        title={props.data.title}
+        visible={open}
+        title={props?.data?.name}
         onOk={handleOk}
         onCancel={handleCancel}
-        footer={[
-
-        ]}
+        footer={[]}
       >
-        <Card
-          style={{ width: '100%' }}
-          cover={
-            <Image
-              alt="picture item"
-              src={props.data.picture}
-              width={'100%'}
-            />
-          }
-        >
+        <Card style={{ width: '100%' }}>
+          <Image
+            alt="picture item"
+            src={props?.data?.picture[0]}
+            width={'100%'} />
           <Space direction='vertical'>
-            <p>{props.data.description}</p>
-
+            <p>{props?.data?.description}</p>
+          </Space>
+          <Space direction='vertical'>
+            <Button> Comprar por: {formatPriceBRL(props?.data?.price)}</Button>
           </Space>
         </Card>
       </Modal>

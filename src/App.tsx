@@ -34,9 +34,9 @@ const AppLayout = () => {
 
   return (
     <Layout style={{ height: '100vh' }}>
-      <Sider breakpoint="lg" collapsedWidth="0" >
+      <Sider breakpoint="lg" collapsedWidth="0" width={300} >
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" mode="inline" defaultSelectedKeys={['home']} style={{ padding: '1rem', paddingTop: '4rem' }} >
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['dashboard']} style={{ padding: '1rem', paddingTop: '4rem' }} >
           {menuItems.map(item => (
             <Menu.Item key={item.key} icon={item.icon}>
               <Link to={item.to}>{item.label}</Link>
@@ -48,7 +48,7 @@ const AppLayout = () => {
         <Header style={{ padding: 0, background: '#fff' }}>
           <Space style={{ fontSize: '1.5rem', justifyContent: 'center', display: 'flex' }}>  {title === 'produtos' ? "Marketplace" : 'Dashboard'}</Space>
         </Header>
-        <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', overflowY: 'auto' }}>
+        <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', display: 'flex:', justifyContent: 'center', overflowY: 'auto' }}>
           <Outlet />
         </Content>
         <Footer style={{ textAlign: 'center' }}>Ant Design ©{new Date().getFullYear()} Created by Ant UED</Footer>
