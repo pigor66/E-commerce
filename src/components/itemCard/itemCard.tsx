@@ -25,9 +25,8 @@ export default function ItemCard(props: IProps) {
         <img
           alt="picture item"
           src={props.item.picture}
-          height={250}
+          height={380}
           width={'100%'}
-
         />
       }
       actions={[
