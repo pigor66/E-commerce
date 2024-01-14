@@ -6,57 +6,51 @@ interface IProps {
   data: any;
   openNotification: (title: string, description: string, type: 'success' | 'error') => void
   addToCar: (value: any) => void
+  setOpen: (value: boolean) => void
+  open: boolean
 }
 const ItemDetails: React.FC<IProps> = (props: IProps) => {
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleOk = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOpen(false);
-    }, 3000);
+
+    props.setOpen(false);
+
   };
 
   const handleCancel = () => {
-    setOpen(false);
+    props.setOpen(false);
   };
 
-  useEffect(() => {
-    console.log(props.data);
-  }, [open]);
+
 
   return (
-    <>
-      <a type='link' onClick={() => setOpen(true)}>
-        Ver detalhes
-      </a>
-
-      <Modal
-        visible={open}
-        title={props?.data?.name}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={[]}
-      >
-        <Card style={{ width: '100%' }}>
-          <Image
-            alt="picture item"
-            src={props?.data?.picture[0]}
-            width={'100%'} />
-          <Space direction='vertical'>
-            <p>{props?.data?.description}</p>
-          </Space>
+    <Modal
+      visible={props.open}
+      title={props?.data?.name}
+      onOk={handleOk}
+      onCancel={handleCancel}
+      footer={[]}
+    >
+      <Card style={{ width: '100%' }}>
+        <Image
+          alt="picture item"
+          src={props?.data?.picture ? props?.data?.picture[0] : null}
+          width={'100%'}
+          height={'100%'} />
+        <Space direction='vertical'>
+          <p>{props?.data?.description}</p>
           <Button type='primary'
             onClick={() => {
               props.addToCar(props.data);
-              setOpen(false)
+              props.setOpen(false)
             }}
-          > Comprar por: {formatPriceBRL(props?.data?.price)}</Button>
-        </Card>
-      </Modal>
-    </>
+          > Comprar por: {formatPriceBRL(props?.data?.price)}
+          </Button>
+        </Space>
+      </Card>
+    </Modal>
+
   );
 };
 

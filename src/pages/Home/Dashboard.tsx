@@ -1,92 +1,154 @@
-import { Image, Col, List, Row, Space, Typography, Button, Divider, Card } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Col, List, Row, Space, Typography, Button, Card, Spin, Popconfirm, message, Carousel } from 'antd';
+import { useState } from 'react';
 import ItemModal from '../../components/Modal/ItemModal';
-import items from './../../Data/data.json';
 import VirtualList from 'rc-virtual-list';
+import { PlusOutlined } from '@ant-design/icons';
+import { useQuery } from 'react-query';
 const { Title, Paragraph } = Typography;
 
-export function formatPriceBRL(valor: number) {
-  // Verifica se o valor é um número
-  if (isNaN(valor)) {
+export function formatPriceBRL(value: number) {
+  if (isNaN(value)) {
     return 'Valor inválido';
   }
-
-  // Formata o valor como moeda
-  const valorFormatado = new Intl.NumberFormat('pt-BR', {
+  const formatValue = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  }).format(valor);
+  }).format(value);
 
-  return valorFormatado;
+  return formatValue;
 }
+
+export function DeleteItem(item: any) {
+  const confirm = () => {
+    console.log();
+    message.success('Click on Yes');
+  };
+
+  const cancel = () => {
+    console.log();
+    message.error('Click on No');
+  };
+
+  return (
+
+    <Popconfirm
+      title="Delete the task"
+      description="Are you sure to delete this task?"
+      onConfirm={confirm}
+      onCancel={cancel}
+      okText="Yes"
+      cancelText="No"
+    >
+      <Button danger>Delete</Button>
+    </Popconfirm>
+
+  )
+
+
+
+}
+
 
 function Dashboard() {
   const [open, setOpen] = useState(false);
   const [openNew, setOpenNew] = useState(false);
-  const [editItem, setEditItem] = useState(null); // Adicionei null como valor inicial
+  const [selectedItem, setSelectedItem] = useState(null); // Adicionei null como valor inicial
+
+
+  const { data, isLoading, isError } = useQuery('products', () =>
+    fetch('https://65a04dee600f49256fafd1ae.mockapi.io/products').then((res) => res.json())
+  );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading data</div>;
+  }
+
+
 
   const showModal = () => {
     setOpenNew(true);
   };
 
+
+  function editItem(item: any) {
+    setSelectedItem(item)
+    setOpenNew(true)
+  }
+
+
+
   return (
 
     <Row gutter={[24, 24]}>
-
       <Col span={24}>
-        <Space>
+        <Space >
           <ItemModal setOpen={setOpenNew} open={openNew} />
-          <Button type="primary" onClick={showModal}>
-            Novo item
-          </Button>
+          <Button type="primary" onClick={showModal} shape='round' icon={<PlusOutlined />} style={{ padding: '0 0.5rem ' }} />
+
         </Space>
       </Col>
       <Col span={24}>
-        <List>
-          <VirtualList
-            data={items.products}
-            height={800}
-            itemHeight={47}
-            itemKey="email"
-          >
-            {(item: any) => (
-              <List.Item key={item.id} style={{ width: '100%' }}>
-                <Card style={{ width: '100%' }}>
-                  <Row gutter={[24, 24]} style={{ width: '100%' }}>
-                    <Col lg={4} md={12} span={24} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                      <Image width={'100%'} height={'auto'} src={item.picture[0]} />
-                    </Col>
+        {data ?
+          <List>
+            <VirtualList
+              data={data}
+              height={800}
+              itemHeight={47}
+              itemKey="email"
+            >
+              {(item: any) => (
+                <List.Item key={item.id} style={{ width: '100%' }}>
+                  <Card style={{ width: '100%' }}>
+                    <Row gutter={[24, 24]} style={{ width: '100%' }}>
+                      <Col lg={4} md={12} span={24} >
+                        <Carousel >
+                          {item.picture.map((pictures: string) => {
+                            return (
+                              <div key={pictures}>
+                                <div style={{ backgroundImage: `url('${pictures}')`, width: '100%', height: '15rem', backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: 'no-repeat' }} >
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </Carousel>
+                      </Col>
 
-                    <Col lg={18} md={24} span={24}>
-                      <Space direction='vertical' size='small' style={{ width: '100%' }}>
-                        <Title level={4} style={{ margin: 0 }}>
-                          {item.name}
-                        </Title>
-                        <Title level={5} style={{ margin: 0 }}>
-                          Valor: {formatPriceBRL(item.price)}
-                        </Title>
-                        <Paragraph style={{ margin: 0, maxWidth: '80rem' }}>
-                          {item.description}
-                        </Paragraph>
-                        <Space style={{ width: '100%' }}>
-                          <Button block type='primary'>Editar</Button>
-                          <Button type='primary' danger>Excluir</Button>
+                      <Col lg={18} md={24} span={24} style={{ display: 'flex', alignItems: "center" }}>
+                        <Space direction='vertical' size='small' style={{ width: '100%' }}>
+                          <Title level={4} style={{ margin: 0 }}>
+                            {item.name}
+                          </Title>
+                          <Title level={5} style={{ margin: 0 }}>
+                            Valor: {formatPriceBRL(item.price)}
+                          </Title>
+                          <Paragraph style={{ margin: 0, maxWidth: '80rem' }}>
+                            {item.description}
+                          </Paragraph>
+                          <Space style={{ width: '100%' }}>
+                            <Button block type='primary' onClick={() => editItem(item)}>Editar</Button>
+                            <DeleteItem item={item} />                          </Space>
                         </Space>
-                      </Space>
-                    </Col>
+                      </Col>
+                    </Row>
+                  </Card>
+                </List.Item>
 
-                  </Row>
-                </Card>
-              </List.Item>
-
-            )}
-          </VirtualList>
-        </List>
+              )}
+            </VirtualList>
+          </List>
+          :
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '50vh' }}>
+            <Spin size="large" />
+          </div>
+        }
 
       </Col>
-      <ItemModal setOpen={setOpen} open={open} editItem={editItem} />
+      <ItemModal setOpen={setOpen} open={open} selectedItem={selectedItem} />
     </Row>
-
   );
 }
 

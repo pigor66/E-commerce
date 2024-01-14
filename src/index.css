@@ -1,3 +1,21 @@
-body{
+body {
   margin: 0;
+}
+.ant-carousel .slick-dots li.slick-active{
+  width:1rem
+}
+
+.ant-carousel .slick-dots-bottom {
+bottom:0
+}
+.ant-carousel .slick-dots li button {
+  background-color: #00101e;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 1rem;
+  margin:0
+}
+
+.ant-carousel .slick-dots li.slick-active button {
+  background-color: #002c52;
 }

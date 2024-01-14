@@ -1,13 +1,23 @@
-import { Row, Col, Space, Button, Card, notification, Typography } from 'antd';
-import items from './../../Data/data.json';
+import { Row, Col, Space, Button, Card, notification, Typography, Carousel, Image } from 'antd';
 import ItemDetails from '../../components/ItemDetails/ItemDetails';
 import Meta from 'antd/es/card/Meta';
 import { formatPriceBRL } from '../Home/Dashboard';
 import Car from '../../components/Car/car';
+import { useState } from 'react';
+import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import item from './../../Data/data.json'
+
 const { Title, Paragraph } = Typography;
 
 function Products() {
   const [api, contextHolder] = notification.useNotification();
+  const [open, setOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>('');
+  const navigate = useNavigate()
+  const [data, setData] = useState(item.products);
+
+
 
   function openNotification(title: string, description: string, type: 'success' | 'error') {
     api[type]({
@@ -25,39 +35,47 @@ function Products() {
       <Col span={24} lg={23} style={{ display: 'flex', justifyContent: 'center' }}>
         <Row gutter={[24, 24]} style={{ width: '100%' }}  >
           {contextHolder}
-          {items.products.map((item: any) => (
-            <Col span={24} md={12} lg={8} key={item.id} style={{ display: 'flex', justifyContent: 'center' }}>
-              <Card
-                style={{ width: '100%' }}
-                hoverable
-                cover={
-                  <div style={{ backgroundImage: `url('${item.picture}')`, width: '100%', height: '15rem', backgroundSize: "cover", backgroundPosition: "center" }} >
+          {data.map((item: any) => {
+            return (
+              <Col span={24} md={12} lg={8} key={item.id} style={{ display: 'flex', justifyContent: 'center' }}>
+                <Card
+                  style={{ width: '100%' }}
+                  hoverable
+                  cover={
+                    <Carousel >
+                      {item.picture.map((pictures: string) => {
+                        return (
+                          <div key={pictures}>
+                            <div style={{ backgroundImage: `url('${pictures}')`, width: '100%', height: '15rem', backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: 'no-repeat' }} >
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </Carousel>
+                  }
+
+                >
+                  <div onClick={() => navigate(`/produto/${item.id}`)}
+                  >
+                    <Space direction='vertical' style={{ width: '100%' }}>
+                      <Title level={4} style={{ margin: "0" }}>
+                        {item?.name}
+                      </Title>
+                      {formatPriceBRL(item.price)}
+                    </Space>
+                    <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
+                      {item.description && item.description.length > 100
+                        ? `${item.description.slice(0, 100)}...`
+                        : item.description}
+                    </p>
+
                   </div>
-                }
-                actions={
-                  [
-                    <ItemDetails data={item} addToCar={addToCar} openNotification={openNotification} />
-                  ]
-                }
-              >
-                <Space direction='vertical' style={{ width: '100%' }}>
-                  <Space direction='vertical'>
-                    <Title level={4} style={{ margin: "0" }}>
-                      {item?.name}
-                    </Title>
-                  </Space>
-                  <Button key="buy" onClick={() => {
-                    addToCar(item)
-                  }}>{formatPriceBRL(item.price)}</Button>
-                </Space>
-                <p style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
-                  {item.description && item.description.length > 100
-                    ? `${item.description.slice(0, 100)}...`
-                    : item.description}
-                </p>
-              </Card>
-            </Col>
-          ))}
+                </Card>
+              </Col>
+            )
+          })}
+          <ItemDetails data={selectedItem} addToCar={addToCar} openNotification={openNotification}
+            open={open} setOpen={setOpen} />
         </Row>
       </Col>
       <Car />
