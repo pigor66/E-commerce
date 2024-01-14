@@ -56,6 +56,7 @@ function Products() {
 
                 >
                   <div onClick={() => navigate(`/produto/${item.id}`)}
+                    style={{ marginTop: '2rem' }}
                   >
                     <Space direction='vertical' style={{ width: '100%' }}>
                       <Title level={4} style={{ margin: "0" }}>

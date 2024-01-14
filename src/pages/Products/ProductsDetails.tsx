@@ -34,7 +34,7 @@ function ProductsDetails() {
       {contextHolder}
       {
         selectedItem ?
-          <Col span={24} lg={23} >
+          <Col span={24} lg={20} style={{ paddingBottom: '2rem' }} >
             <Carousel >
               {selectedItem?.picture?.map((pictures: string) => {
                 return (
@@ -47,21 +47,23 @@ function ProductsDetails() {
             </Carousel>
             <Space direction='vertical' style={{ marginTop: '2rem' }}>
               <Space direction='vertical' style={{ width: '100%' }}>
-                <Title level={4} style={{ margin: "0" }}>
+                <Title level={2} style={{ margin: "0" }}>
                   {selectedItem?.name}
                 </Title>
-                {formatPriceBRL(selectedItem?.price)}
+                <Title level={4} style={{ margin: "0" }}>
+                  {formatPriceBRL(selectedItem?.price)}
+                </Title>
               </Space>
-              <Title level={4} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
+              <Title level={3} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
                 {selectedItem?.description}
               </Title>
               <Car />
               <Row gutter={[24, 0]}>
                 {selectedItem?.specifications.map((specification: any) => {
                   return (
-                    <Col span={12}>
+                    <Col span={24} lg={12}>
                       <Space direction='vertical'>
-                        <Title level={4}>{specification?.attribute}</Title>
+                        <Title level={4} style={{ marginBottom: '0rem' }}>{specification?.attribute}</Title>
                         <Title level={5} style={{ color: 'greey', margin: '0' }}>{specification?.value}</Title>
                       </Space>
                     </Col>

@@ -3,7 +3,8 @@ import { useState } from 'react';
 import ItemModal from '../../components/Modal/ItemModal';
 import VirtualList from 'rc-virtual-list';
 import { PlusOutlined } from '@ant-design/icons';
-import { useQuery } from 'react-query';
+import item from './../../Data/data.json';
+
 const { Title, Paragraph } = Typography;
 
 export function formatPriceBRL(value: number) {
@@ -20,7 +21,6 @@ export function formatPriceBRL(value: number) {
 
 export function DeleteItem(item: any) {
   const confirm = () => {
-    console.log();
     message.success('Click on Yes');
   };
 
@@ -43,31 +43,12 @@ export function DeleteItem(item: any) {
     </Popconfirm>
 
   )
-
-
-
 }
-
 
 function Dashboard() {
   const [open, setOpen] = useState(false);
   const [openNew, setOpenNew] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); // Adicionei null como valor inicial
-
-
-  const { data, isLoading, isError } = useQuery('products', () =>
-    fetch('https://65a04dee600f49256fafd1ae.mockapi.io/products').then((res) => res.json())
-  );
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error loading data</div>;
-  }
-
-
 
   const showModal = () => {
     setOpenNew(true);
@@ -92,10 +73,10 @@ function Dashboard() {
         </Space>
       </Col>
       <Col span={24}>
-        {data ?
+        {item.products ?
           <List>
             <VirtualList
-              data={data}
+              data={item.products}
               height={800}
               itemHeight={47}
               itemKey="email"
