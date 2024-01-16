@@ -21,12 +21,19 @@ const Cart: React.FC = () => {
     setOpen(false);
   };
 
+  const calculateTotal = () => {
+    if (contextValue?.cart) {
+      const total = contextValue.cart.reduce((acc, item) => acc + item.price, 0);
+      return formatPriceBRL(total);
+    }
+    return '0.00';
+  };
   return (
     <>
       <FloatButton type='primary' onClick={showDrawer} icon={<ShoppingCartOutlined />}
         badge={{ count: contextValue?.cart.length, color: 'red' }}
       />
-      <Drawer title="Carrinho" placement="right" onClose={onClose} open={open}>
+      <Drawer title={contextValue?.cart ? ` Total ${calculateTotal()}` : "Carrinho "} placement="right" onClose={onClose} open={open}>
         <Row gutter={[24, 24]} style={{ paddingBottom: '2rem' }}>
           <Col span={24}>
             {contextValue?.cart.length ?
@@ -35,7 +42,7 @@ const Cart: React.FC = () => {
                   data={contextValue.cart}
                   height={800}
                   itemHeight={47}
-                  itemKey="id" // <-- Alterado para uma propriedade única do seu item, como 'id'
+                  itemKey="id"
                 >
                   {(item: any) => (
                     <List.Item key={item.id} style={{ width: '100%' }}>

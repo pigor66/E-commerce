@@ -35,8 +35,7 @@ const Checkout: React.FC = () => {
   }, [addressData, isError]);
 
   const handleSearchAddress = () => {
-    // Não é necessário chamar useSearchAddress aqui, pois ele já está sendo chamado automaticamente pelo hook
-    // Basta setar o código postal, e o hook será acionado automaticamente
+
     setPostalCode(postalCode);
   };
 
@@ -56,17 +55,30 @@ const Checkout: React.FC = () => {
     }, 2000);
   };
 
+  const calculateTotal = () => {
+    if (contextValue?.cart) {
+      const total = contextValue.cart.reduce((acc, item) => acc + item.price, 0);
+      return formatPriceBRL(total);
+    }
+    return '0.00';
+  };
+
   return (
     <Row justify={'center'} gutter={[24, 24]} style={{ marginTop: '3rem' }}>
       <Col lg={20} span={24}>
         <Form name="basic" onFinish={onFinish} layout="vertical">
-          <Title level={4} >
-            Endereço:
-          </Title>
           {contextHolder}
           <Row gutter={[24, 0]}>
 
             <Col lg={24}>
+              <Title level={3} >
+                Total da compra: {calculateTotal()}
+              </Title>
+            </Col>
+            <Col lg={24}>
+              <Title level={4} >
+                Endereço:
+              </Title>
               <Form.Item label="Digite seu CEP" name="name" initialValue={postalCode} rules={[{ required: true, message: 'Por favor, insira o CEP!' }]}>
                 <Space>
                   <Input type="number" value={postalCode} onChange={(e) => setPostalCode(e.target.value)} style={{ width: '10rem' }} />
