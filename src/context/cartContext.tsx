@@ -1,83 +1,55 @@
-// cartContext.tsx
-import React, { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
+import { ProductSelected } from '../hooks/types';
+import { notification } from 'antd';
 
-type Product = {
-  id: number;
-  name: string;
-  price: number;
-};
+interface CartContextProps {
+  cart: ProductSelected[];
+  addItemToCart: (item: ProductSelected) => void;
+  removeItemToCart: (item: ProductSelected) => void;
+  clearCart: () => void;
+}
 
-type CartItem = {
-  product: Product;
-  quantity: number;
-};
+export const CartContext = createContext<CartContextProps | undefined>(undefined);
 
-type CartState = {
-  items: CartItem[];
-};
+export default function CartProvider({ children }: any) {
+  const initialCart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const [cart, setCart] = useState<ProductSelected[]>(initialCart);
+  const [api, contextHolder] = notification.useNotification();
 
-type CartAction =
-  | { type: 'ADD_TO_CART'; payload: { product: Product } }
-  | { type: 'REMOVE_FROM_CART'; payload: { productId: number } }
-  | { type: 'CLEAR_CART' };
 
-type CartDispatch = Dispatch<CartAction>;
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
-const CartStateContext = createContext<CartState | undefined>(undefined);
-const CartDispatchContext = createContext<CartDispatch | undefined>(undefined);
+  function openNotification(title: string, description: string, type: 'success' | 'error' | 'warning') {
+    api[type]({
+      message: title,
+      description: description,
+    });
+  };
 
-type CartProviderProps = { children: ReactNode };
-
-const cartReducer = (state: CartState, action: CartAction): CartState => {
-  switch (action.type) {
-    case 'ADD_TO_CART':
-      const existingItemIndex = state.items.findIndex(item => item.product.id === action.payload.product.id);
-
-      if (existingItemIndex !== -1) {
-        const updatedItems = [...state.items];
-        updatedItems[existingItemIndex].quantity += 1;
-
-        return { ...state, items: updatedItems };
-      } else {
-        return { ...state, items: [...state.items, { product: action.payload.product, quantity: 1 }] };
-      }
-
-    case 'REMOVE_FROM_CART':
-      const updatedItems = state.items.filter(item => item.product.id !== action.payload.productId);
-      return { ...state, items: updatedItems };
-
-    case 'CLEAR_CART':
-      return { ...state, items: [] };
-
-    default:
-      return state;
+  function addItemToCart(item: ProductSelected) {
+    if (!cart.some(cartItem => cartItem.id === item.id)) {
+      setCart([...cart, item]);
+      openNotification('Adicionado ao seu carrinho', `O produto ${item.name} foi adicionado ao carrinho`, 'success')
+    } else {
+      openNotification('Este produto ja esta no carrinho', `O produto ${item.name} já foi adicionado ao carrinho`, 'warning')
+    }
   }
-};
 
-const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(cartReducer, { items: [] });
+  function removeItemToCart(item: ProductSelected) {
+    const itemsFiltered = cart.filter((cartItem: ProductSelected) => item.id !== cartItem.id);
+    setCart(itemsFiltered);
+  }
+
+  function clearCart() {
+    setCart([]);
+  }
 
   return (
-    <CartStateContext.Provider value={state}>
-      <CartDispatchContext.Provider value={dispatch}>{children}</CartDispatchContext.Provider>
-    </CartStateContext.Provider>
+    <CartContext.Provider value={{ cart, addItemToCart, removeItemToCart, clearCart }}>
+      {contextHolder}
+      {children}
+    </CartContext.Provider>
   );
-};
-
-const useCartState = (): CartState => {
-  const context = useContext(CartStateContext);
-  if (context === undefined) {
-    throw new Error('useCartState must be used within a CartProvider');
-  }
-  return context;
-};
-
-const useCartDispatch = (): CartDispatch => {
-  const context = useContext(CartDispatchContext);
-  if (context === undefined) {
-    throw new Error('useCartDispatch must be used within a CartProvider');
-  }
-  return context;
-};
-
-export { CartProvider, useCartState, useCartDispatch };
+}

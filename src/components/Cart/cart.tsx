@@ -6,6 +6,7 @@ import item from '../../Data/data.json'
 import VirtualList from 'rc-virtual-list';
 import formatPriceBRL from '../../utils/DashboardUtils';
 import { useCart } from '../../context/types';
+import { CartContext } from '../../context/cartContext';
 
 
 const { Title, Paragraph } = Typography;
@@ -14,7 +15,7 @@ const { Title, Paragraph } = Typography;
 
 const Cart: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const { items, removeItem, clearCart } = useCart();
+  const contextValue = useContext(CartContext);
 
   const showDrawer = () => {
     setOpen(true);
@@ -27,16 +28,16 @@ const Cart: React.FC = () => {
   return (
     <>
       <FloatButton type='primary' onClick={showDrawer} icon={<ShoppingCartOutlined />}
-        badge={{ count: 10, color: 'red' }}
+        badge={{ count: contextValue?.cart.length, color: 'red' }}
       />
 
       <Drawer title="Carrinho" placement="right" onClose={onClose} open={open}>
         <Row gutter={[24, 24]} style={{ paddingBottom: '2rem' }}>
           <Col span={24}>
-            {item.products ?
+            {contextValue?.cart ?
               <List>
                 <VirtualList
-                  data={item.products}
+                  data={contextValue.cart}
                   height={800}
                   itemHeight={47}
                   itemKey="email"
@@ -73,7 +74,7 @@ const Cart: React.FC = () => {
                                   : item.description}
                               </Paragraph>
                               <Space style={{ width: '100%' }}>
-                                <Button block danger type='primary'>Removar</Button>
+                                <Button block danger type='primary' onClick={() => contextValue.removeItemToCart(item)}>Remover</Button>
                               </Space>
                             </Space>
 

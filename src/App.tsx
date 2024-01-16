@@ -4,7 +4,7 @@ import { Layout, Menu, Space } from 'antd';
 import { ControlOutlined, HomeOutlined, ShoppingOutlined } from '@ant-design/icons/lib/icons';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import logo from './logo.png';
-import { CartProvider } from './context/cartContext';
+import CartProvider from './context/cartContext';
 const { Sider, Header, Content, Footer } = Layout;
 
 const menuItems = [

@@ -1,16 +1,18 @@
 // Products.tsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { Row, Col, Card, Space, Typography, Carousel, Spin, Button } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useGetProducts';
 import Cart from '../../components/Cart/cart';
-import { useCartDispatch } from '../../context/cartContext';
+import formatPriceBRL from '../../utils/DashboardUtils';
+import { CartContext } from '../../context/cartContext';
 
 const { Title, Paragraph } = Typography;
 
 function Products() {
+  const navigate = useNavigate()
   const { data: products, error, isLoading } = useProducts();
-  const dispatch = useCartDispatch();
+  const contextValue = useContext(CartContext);
 
   if (isLoading) {
     return (
@@ -26,9 +28,6 @@ function Products() {
     return <p>Ocorreu um erro ao obter os dados</p>;
   }
 
-  const addToCart = (productId: number) => {
-    dispatch({ type: 'ADD_TO_CART', payload: { product: { id: productId, name: 'Product Name', price: 10.0 } } });
-  };
 
   return (
     <Row gutter={[24, 24]} justify="center" style={{ marginTop: '2rem' }}>
@@ -58,8 +57,18 @@ function Products() {
                   </Carousel>
                 }
                 actions={[
-                  <Button onClick={() => addToCart(item.id)}>Adicionar ao carrinho</Button>,
-                  <Link to={`/produto/detalhes/${item.id}`}>Ver detalhes</Link>
+                  <Row gutter={[24, 24]} justify={'center'}>
+                    <Col span={11}>
+                      <Button type='primary' block onClick={() => contextValue?.addItemToCart(item)}>
+                        Comprar
+                      </Button>
+                    </Col>
+                    <Col span={11}>
+                      <Button block onClick={() => navigate(`/produto/detalhes/${item.id}`)}>
+                        Ver detalhes
+                      </Button>
+                    </Col>
+                  </Row>
                 ]}
               >
                 <Space direction="vertical" style={{ width: '100%' }}>
@@ -67,7 +76,7 @@ function Products() {
                     {item?.name}
                   </Title>
                   <Title level={5} style={{ margin: '0' }}>
-                    {item.price}
+                    {formatPriceBRL(item.price)}
                   </Title>
                 </Space>
                 <Paragraph style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>

@@ -1,12 +1,13 @@
-import { Row, Col, Space, notification, Typography, Carousel, Spin, Image, Statistic, } from 'antd';
+import { Row, Col, Space, notification, Typography, Carousel, Spin, Image, Statistic, Button, } from 'antd';
 
 import formatPriceBRL from '../../utils/DashboardUtils';
 import Car from '../../components/Cart/cart';
 import data from './../../Data/data.json'
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Specification } from '../../hooks/types';
 import { useProduct } from '../../hooks/useGetProducts';
+import { CartContext } from '../../context/cartContext';
 const { Title, Paragraph } = Typography;
 
 
@@ -19,6 +20,7 @@ function ProductsDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: selectedProduct, isLoading, error } = useProduct(id ? id : '');
+  const contextValue = useContext(CartContext);
 
 
   if (isLoading) {
@@ -73,7 +75,10 @@ function ProductsDetails() {
               {selectedProduct?.name}
             </Title>
             <Title level={4} style={{ margin: '0' }}>
-              {formatPriceBRL(selectedProduct?.price)}
+
+              <Button type='primary' onClick={() => contextValue?.addItemToCart(selectedProduct)} >
+                Adicionar ao carrinho {formatPriceBRL(selectedProduct?.price)}
+              </Button>
             </Title>
           </Space>
           <Title level={3} style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'wrap' }}>
