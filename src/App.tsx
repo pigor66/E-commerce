@@ -4,6 +4,7 @@ import { Layout, Menu, Space } from 'antd';
 import { ControlOutlined, HomeOutlined, ShoppingOutlined } from '@ant-design/icons/lib/icons';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import logo from './logo.png';
+import { CartProvider } from './context/cartContext';
 const { Sider, Header, Content, Footer } = Layout;
 
 const menuItems = [
@@ -58,7 +59,9 @@ const AppLayout = () => {
           <Space style={{ fontSize: '1.5rem', justifyContent: 'center', display: 'flex' }}>  {title === '' ? "Marketplace" : 'Dashboard'}</Space>
         </Header>
         <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', display: 'flex:', justifyContent: 'center', overflowY: 'auto' }}>
-          <Outlet />
+          <CartProvider>
+            <Outlet />
+          </CartProvider>
         </Content>
       </Layout>
     </Layout>
