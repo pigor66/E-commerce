@@ -1,4 +1,4 @@
-import { notification, Modal, Form, Row, Col, Input, Upload, Button, UploadFile } from "antd";
+import { notification, Modal, Form, Row, Col, Input, Upload, Button, UploadFile, Space, Spin } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { useState, useEffect } from "react";
 import { Product } from "../../hooks/types";
@@ -6,40 +6,52 @@ import { addProduct, updateProduct } from "../../hooks/useProductsServices";
 import { useProduct, useProducts } from "../../hooks/useGetProducts";
 import service from "../../services/api";
 import { useNavigate, useParams } from "react-router-dom";
-
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 
 const ProductForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: selectedProduct } = useProduct(id ? id : '');
+  const { data: selectedProduct, isLoading } = useProduct(id ? id : '');
 
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [name, setName] = useState(selectedProduct ? selectedProduct.name : '');
   const [description, setDescription] = useState(selectedProduct ? selectedProduct.description : '');
   const [price, setPrice] = useState<number | null>(selectedProduct ? selectedProduct.price : null);
+  const [characteristics, setCharacteristics] = useState<any>([]);
+  const [details, setDetails] = useState<any>([]);
   const [formattedPrice, setFormattedPrice] = useState<string>(selectedProduct ? selectedProduct.price : '');
   const [api, contextHolder] = notification.useNotification();
   const { data: products, } = useProducts();
 
+
   useEffect(() => {
-    setName(selectedProduct ? selectedProduct.name : '');
-    setDescription(selectedProduct ? selectedProduct.description : '');
-    setFormattedPrice(selectedProduct ? formatCurrency(selectedProduct.price) : '');
-    setPrice(selectedProduct ? selectedProduct.price : null);
+    if (!isLoading && selectedProduct) {
+      setName(selectedProduct.name || '');
+      setDescription(selectedProduct.description || '');
+      setFormattedPrice(formatCurrency(selectedProduct.price || 0));
+      setPrice(selectedProduct.price || null);
 
-    setFileList(selectedProduct && selectedProduct.picture
-      ? selectedProduct.picture.map((url: string, index: number) => ({
-        uid: `${index}`,
-        status: 'done',
-        url,
-      }))
-      : []
-    );
+      setFileList(
+        selectedProduct.picture
+          ? selectedProduct.picture.map((url: string, index: number) => ({
+            uid: `${index}`,
+            status: 'done',
+            url,
+          }))
+          : []
+      );
 
-
-
-  }, [selectedProduct]);
+      if (selectedProduct.specifications) {
+        setCharacteristics(selectedProduct.specifications.map((item: any) => item.attribute));
+        setDetails(selectedProduct.specifications.map((item: any) => item.value));
+      } else {
+        setCharacteristics([]);
+        setDetails([]);
+      }
+      console.log(selectedProduct);
+    }
+  }, [isLoading, selectedProduct]);
 
   const beforeUpload = (file: File) => {
     const isImage = file.type.startsWith('image/');
@@ -81,7 +93,7 @@ const ProductForm: React.FC = () => {
     return '';
   };
 
-  const onFinish = async (values: Product) => {
+  const onFinish = async (values: any) => {
     try {
       const updatedFileList = await Promise.all(fileList.map(async (file) => {
         if (!file.url && file.originFileObj instanceof Blob) {
@@ -104,6 +116,14 @@ const ProductForm: React.FC = () => {
 
       const itemId = selectedProduct.id ? selectedProduct.id : products.length + 1;
 
+      const characteristics = values.characteristics || [];
+      const details = values.details || [];
+
+      const specifications = characteristics.map((attribute: string, index: number) => ({
+        attribute,
+        value: details[index] || '',
+      }));
+
       const newItem: Product = {
         id: itemId,
         name,
@@ -111,7 +131,7 @@ const ProductForm: React.FC = () => {
         price: price !== null ? price : 0,
         date: new Date().toLocaleDateString(),
         picture: updatedFileList.map((file) => file.url || ''),
-        specifications: [],
+        specifications: specifications,
       };
 
       if (id) {
@@ -132,6 +152,16 @@ const ProductForm: React.FC = () => {
       openNotification('Falha ao realizar a operação', 'Ocorreu um erro ao processar a operação.', 'error');
     }
   };
+
+  if (isLoading) {
+    return (
+      <div style={{ marginTop: '10rem' }}>
+        <Spin tip="Carregando..." size="large">
+          <div className="content" />
+        </Spin>
+      </div>
+    );
+  }
 
 
 
@@ -163,7 +193,9 @@ const ProductForm: React.FC = () => {
                 <TextArea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} />
               </Form.Item>
             </Col>
-            <Col lg={24} style={{ display: 'flex', justifyContent: 'center' }}>
+
+
+            <Col span={24} style={{ display: 'flex', justifyContent: 'center' }}>
               <Form.Item label="Imagens" name="picture" initialValue={fileList} rules={[{ required: true, message: 'Por favor, insira ao menos uma imagem!' }]}>
                 <Upload
                   listType="picture-card"
@@ -178,9 +210,14 @@ const ProductForm: React.FC = () => {
             </Col>
           </Row>
           <Form.Item>
-            <Button type="primary" htmlType="submit" block>
-              {selectedProduct ? 'Atualizar produto' : 'Salvar novo item'}
-            </Button>
+            <Space>
+              <Button >
+                Cancelar
+              </Button>
+              <Button type="primary" htmlType="submit" >
+                {id ? 'Atualizar produto' : 'Salvar novo item'}
+              </Button>
+            </Space>
           </Form.Item>
         </Form>
       </Col>

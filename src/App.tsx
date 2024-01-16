@@ -34,14 +34,14 @@ const AppLayout = () => {
   }, [path]);
 
   return (
-    <Layout style={{ height: '100vh' }}>
-      <Sider breakpoint="lg" collapsedWidth="0" width={300}>
+    <Layout style={{ height: '100vh' }} >
+      <Sider breakpoint="lg" collapsedWidth="0" width={300} style={{ backgroundColor: '#fcfcfc' }}>
         <Space direction='vertical' style={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-          <Space direction='vertical' style={{ padding: '1rem' }}>
-            <div style={{ padding: '0 5rem' }}>
-              <img src={logo} alt="" style={{ width: '100%' }} />
+          <Space direction='vertical' >
+            <div style={{ padding: '0rem', display: 'flex', justifyContent: "center" }}>
+              <img src={logo} alt="Logo" style={{ width: '100%' }} />
             </div>
-            <Menu theme="dark" mode="inline" defaultSelectedKeys={['store']}>
+            <Menu theme='light' mode="inline" defaultSelectedKeys={['store']} style={{ padding: '0rem 1rem', backgroundColor: '#fcfcfc' }}>
               {menuItems.map(item => (
                 <Menu.Item key={item.key} icon={item.icon}>
                   <Link to={item.to}>{item.label}</Link>
@@ -49,7 +49,7 @@ const AppLayout = () => {
               ))}
             </Menu>
           </Space>
-          <Footer style={{ backgroundColor: '#00101e', color: '#fff', textAlign: 'center' }}>
+          <Footer style={{ backgroundColor: '#fcfcfc', color: '#000000', textAlign: 'center' }}>
             ©{new Date().getFullYear()} Created by Higor Ribeiro
           </Footer>
         </Space>
@@ -58,7 +58,7 @@ const AppLayout = () => {
         <Header style={{ padding: 0, background: '#fff', }}>
           <Space style={{ fontSize: '1.5rem', justifyContent: 'center', display: 'flex' }}>  {title === '' ? "Marketplace" : 'Dashboard'}</Space>
         </Header>
-        <Content style={{ margin: '24px 16px 0', backgroundColor: "#fff", padding: '1rem', display: 'flex:', justifyContent: 'center', overflowY: 'auto' }}>
+        <Content style={{ margin: '24px 16px 10px', backgroundColor: "#fff", padding: '1rem', display: 'flex:', justifyContent: 'center', overflowY: 'auto' }}>
           <CartProvider>
             <Outlet />
           </CartProvider>

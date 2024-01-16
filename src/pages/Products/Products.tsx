@@ -1,11 +1,13 @@
 // Products.tsx
-import React, { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Row, Col, Card, Space, Typography, Carousel, Spin, Button } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useGetProducts';
 import Cart from '../../components/Cart/cart';
 import formatPriceBRL from '../../utils/DashboardUtils';
 import { CartContext } from '../../context/cartContext';
+import Filters from '../../components/Filters/Filters';
+import { ProductSelected } from '../../hooks/types';
 
 const { Title, Paragraph } = Typography;
 
@@ -13,6 +15,54 @@ function Products() {
   const navigate = useNavigate()
   const { data: products, error, isLoading } = useProducts();
   const contextValue = useContext(CartContext);
+  const [selectedFilter, setSelectedFilter] = useState<string>('');
+  const [searchValue, setSearchValue] = useState<string>('');
+  const [filteredProducts, setFilteredProducts] = useState<ProductSelected[]>(products);
+
+  useEffect(() => {
+    if (products) {
+      setFilteredProducts(products)
+    }
+  }, [products]);
+
+
+  useEffect(() => {
+    switch (selectedFilter) {
+      case 'date':
+        if (searchValue !== '') {
+          const itemsArray = products.filter((item: ProductSelected) => searchValue === item.date);
+          setFilteredProducts(itemsArray);
+        }
+        break;
+
+      case 'name':
+        if (searchValue !== '') {
+          const itemsArray = products.filter((item: ProductSelected) => searchValue === item.name);
+          setFilteredProducts(itemsArray);
+        }
+        break;
+
+      case 'price':
+        if (searchValue !== '') {
+          const itemsArray = products.filter((item: ProductSelected) => parseFloat(searchValue) === item.price);
+          setFilteredProducts(itemsArray);
+        }
+        break;
+
+
+      default:
+        break;
+    }
+
+  }, [searchValue, selectedFilter]);
+
+  const handleFilterChange = (filter: string) => {
+    setSelectedFilter(filter);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+  };
 
   if (isLoading) {
     return (
@@ -33,7 +83,19 @@ function Products() {
     <Row gutter={[24, 24]} justify="center" style={{ marginTop: '2rem' }}>
       <Col span={24} lg={23} style={{ display: 'flex', justifyContent: 'center' }}>
         <Row gutter={[24, 24]} style={{ width: '100%' }}>
-          {products.map((item: any) => (
+          <Col span={24}>
+            <Space direction='vertical'>
+              <Title level={5} style={{ margin: 0, width: '4rem' }}>Filtros:</Title>
+              <Filters
+                onFilterChange={handleFilterChange}
+                onSearchChange={handleSearchChange}
+                products={products}
+                selectedFilter={selectedFilter}
+              />
+            </Space>
+          </Col>
+
+          {filteredProducts?.map((item: any) => (
             <Col span={24} md={12} lg={8} key={item.id} style={{ display: 'flex', justifyContent: 'center' }}>
               <Card
                 style={{ width: '100%' }}
@@ -59,9 +121,14 @@ function Products() {
                 actions={[
                   <Row gutter={[24, 24]} justify={'center'}>
                     <Col span={11}>
-                      <Button type='primary' block onClick={() => contextValue?.addItemToCart(item)}>
-                        Comprar
-                      </Button>
+                      {contextValue?.cart.includes(item) ?
+                        <Button block danger onClick={() => contextValue?.removeItemToCart(item)} >Remover</Button>
+                        :
+                        <Button type='primary' block onClick={() => contextValue?.addItemToCart(item)} >
+                          Comprar
+                        </Button>
+                      }
+
                     </Col>
                     <Col span={11}>
                       <Button block onClick={() => navigate(`/produto/detalhes/${item.id}`)}>
